@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { registerUser } from "../../features/auth/authThunks";
 
 export default function Register() {
   const dispatch = useAppDispatch();
-  const { status, error } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { status, error, token } = useAppSelector((state) => state.auth);
 
   const [form, setForm] = useState({
     name: "",
@@ -12,6 +14,13 @@ export default function Register() {
     email: "",
     password: "",
   });
+
+  // Auto-redirect after successful registration
+  useEffect(() => {
+    if (status === "succeeded" && token) {
+      navigate("/", { replace: true });
+    }
+  }, [status, token, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
